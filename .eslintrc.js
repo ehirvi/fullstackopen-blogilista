@@ -22,20 +22,23 @@ module.exports = {
   'parserOptions': {
     'ecmaVersion': 'latest'
   },
+  'plugins': [
+    '@stylistic/js'
+  ],
   'rules': {
-    'indent': [
+    '@stylistic/js/indent': [
       'error',
       2
     ],
-    'linebreak-style': [
+    '@stylistic/js/linebreak-style': [
       'error',
       'unix'
     ],
-    'quotes': [
+    '@stylistic/js/quotes': [
       'error',
       'single'
     ],
-    'semi': [
+    '@stylistic/js/semi': [
       'error',
       'never'
     ],
@@ -46,6 +49,7 @@ module.exports = {
     ],
     'arrow-spacing': [
       'error', { 'before': true, 'after': true }
-    ]
+    ],
+    'no-console': 0
   }
 }
