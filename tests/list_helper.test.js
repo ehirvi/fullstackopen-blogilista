@@ -89,3 +89,18 @@ describe('favorite blog', () => {
     assert.strictEqual(listHelper.favoriteBlog(blogs).title, 'Canonical string reduction')
   })
 })
+
+describe('most blogs', () => {
+
+  test('of empty list', () => {
+    assert.strictEqual(listHelper.mostBlogs([]), null)
+  })
+
+  test('when list has only one blog', () => {
+    assert.strictEqual(listHelper.mostBlogs([blogs[0]]).author, 'Michael Chan')
+  })
+
+  test('of a bigger list', () => {
+    assert.strictEqual(listHelper.mostBlogs(blogs).author, 'Robert C. Martin')
+  })
+})
