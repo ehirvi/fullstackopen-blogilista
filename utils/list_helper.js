@@ -32,4 +32,30 @@ const mostBlogs = (blogs) => {
   }
 }
 
-module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs }
+const mostLikes = (blogs) => {
+  if (blogs.length === 0) {
+    return null
+  }
+  const authors = []
+  const likes = []
+  const output = []
+
+  for (let blog of blogs) {
+    if (authors.includes(blog.author)) {
+      likes[authors.indexOf(blog.author)] += blog.likes
+      output[authors.indexOf(blog.author)][1] += blog.likes
+    } else {
+      authors.push(blog.author)
+      likes.push(blog.likes)
+      output.push([blog.author, blog.likes])
+    }
+  }
+  const outputSorted = _.orderBy(output, [1], 'desc')
+  console.log(outputSorted)
+  return {
+    author: outputSorted[0][0],
+    likes: outputSorted[0][1]
+  }
+}
+
+module.exports = { dummy, totalLikes, favoriteBlog, mostBlogs, mostLikes }
