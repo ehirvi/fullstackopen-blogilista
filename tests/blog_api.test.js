@@ -4,27 +4,13 @@ const mongoose = require('mongoose')
 const supertest = require('supertest')
 const app = require('../app')
 const Blog = require('../models/blog')
+const helper = require('./test_helper')
 
 const api = supertest(app)
 
-const initialBlogs = [
-    {
-        title: 'Pekka flies to the Moon',
-        author: 'Pekka',
-        url: 'pekka.com/blog',
-        likes: 4
-    },
-    {
-        title: 'Pekka drives a car',
-        author: 'Pekka',
-        url: 'pekka.com/blog',
-        likes: 2
-    }
-]
-
 beforeEach(async () => {
     await Blog.deleteMany({})
-    await Blog.insertMany(initialBlogs)
+    await Blog.insertMany(helper.initialBlogs)
 })
 
 test('blogs are returned as json', async () => {
@@ -36,7 +22,13 @@ test('blogs are returned as json', async () => {
 
 test('there are two blogs', async () => {
     const res = await api.get('/api/blogs')
-    assert.strictEqual(res.body.length, initialBlogs.length)
+    assert.strictEqual(res.body.length, helper.initialBlogs.length)
+})
+
+test('blog id\'s are correctly named', async () => {
+    const blogs = await helper.blogsInDb()
+    assert('id' in blogs[0])
+    assert('_id' in blogs[0] === false)
 })
 
 after(async () => {
