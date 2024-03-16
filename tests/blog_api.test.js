@@ -31,6 +31,26 @@ test('blog id\'s are correctly named', async () => {
     assert('_id' in blogs[0] === false)
 })
 
+test('a valid blog can be added', async () => {
+    const newBlog = {
+        title: 'Pekka swims in the ocean',
+        author: 'Pekka',
+        url: 'pekka.com/blog',
+        likes: 8
+    }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const res = await api.get('/api/blogs')
+    const titles = res.body.map(blog => blog.title)
+
+    assert.strictEqual(res.body.length, helper.initialBlogs.length + 1)
+    assert(titles.includes('Pekka swims in the ocean'))
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
