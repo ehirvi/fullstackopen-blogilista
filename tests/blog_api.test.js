@@ -51,7 +51,25 @@ test('a valid blog can be added', async () => {
     assert(titles.includes('Pekka swims in the ocean'))
 })
 
+test('blog without likes is defaulted to zero', async () => {
+    const newBlog = {
+        title: 'Pekka finds out the meaning of life',
+        author: 'Pekka',
+        url: 'pekka.com/blog',
+    }
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+    const res = await api.get('/api/blogs')
+    const likes = res.body.map(blog => blog.likes)
+
+    assert.strictEqual(res.body.length, helper.initialBlogs.length + 1)
+    assert.strictEqual(likes.at(-1), 0)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
-
