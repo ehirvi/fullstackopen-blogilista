@@ -70,6 +70,38 @@ test('blog without likes is defaulted to zero', async () => {
     assert.strictEqual(likes.at(-1), 0)
 })
 
+test('blog without title cannot be added', async () => {
+    const newBlog = {
+        author: 'Pekka',
+        url: 'pekka.com/blog',
+        likes: 5
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const res = await api.get('/api/blogs')
+    assert.strictEqual(res.body.length, helper.initialBlogs.length)
+})
+
+test('blog without url cannot be added', async () => {
+    const newBlog = {
+        title: 'Pekka does a thing',
+        author: 'Pekka',
+        likes: 6
+    }
+
+    await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+
+    const res = await api.get('/api/blogs')
+    assert.strictEqual(res.body.length, helper.initialBlogs.length)
+})
+
 after(async () => {
     await mongoose.connection.close()
 })
