@@ -117,11 +117,11 @@ describe('when some blogs are initially added', () => {
       const blogsAtEnd = await helper.blogsInDb()
       const titles = blogsAtEnd.map(blog => blog.title)
 
-      assert.strictEqual(blogsAtStart.length, blogsAtEnd.length + 1)
+      assert.strictEqual(blogsAtEnd.length + 1, blogsAtStart.length)
       assert(!titles.includes(blogToDelete.title))
     })
 
-    test('fails with error 400 if the id is invalid', async () => {
+    test('fails with error 400 if the id is invalid format', async () => {
       const blogsAtStart = await helper.blogsInDb()
       const blogId = "123abc"
 
@@ -131,9 +131,61 @@ describe('when some blogs are initially added', () => {
 
       const blogsAtEnd = await helper.blogsInDb()
 
-      assert.strictEqual(blogsAtStart.length, blogsAtEnd.length)
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+    })
+
+    test('fails with error 400 if the id is valid but doesn\'t exist', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogId = await helper.nonExistingId()
+
+      await api
+        .delete(`/api/blogs/${blogId}`)
+        .expect(400)
+
+      const blogsAtEnd = await helper.blogsInDb()
+
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+    })
+
+  })
+
+  describe('editing a blog', () => {
+    test('succeeds if id and object are valid', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const blogToEdit = blogsAtStart[0]
+      const editedBlog = { ...blogToEdit, likes: blogToEdit.likes + 100 }
+
+      await api
+        .put(`/api/blogs/${blogToEdit.id}`)
+        .send(editedBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const updatedBlog = blogsAtEnd.filter(blog => blog.id === blogToEdit.id)[0]
+      assert.strictEqual(updatedBlog.likes, blogToEdit.likes + 100)
+    })
+
+    test('fails if id doesn\'t exist', async () => {
+      const blogsAtStart = await helper.blogsInDb()
+      const editedBlog = {
+        title: 'abc',
+        url: 'abc',
+      }
+      // const blogId = '123abc'
+      const blogId = await helper.nonExistingId()
+
+      await api
+        .put(`/api/blogs/${blogId}`)
+        .send(editedBlog)
+        .expect(400)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, blogsAtStart.length)
+
     })
   })
+
 })
 
 after(async () => {
