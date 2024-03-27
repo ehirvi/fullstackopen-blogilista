@@ -8,20 +8,32 @@ usersRouter.get('/', async (req, res) => {
   res.json(allUsers)
 })
 
-usersRouter.post('/', async (req, res) => {
+usersRouter.post('/', async (req, res, next) => {
   const { username, name, password } = req.body
 
-  const saltRounds = 10
-  const passwordHash = await bcrypt.hash(password, saltRounds)
+  if (username === undefined || password === undefined) {
+    return res.status(400).end()
+  }
 
-  const user = new User({
-    username,
-    name,
-    passwordHash
-  })
+  if (username.length < 3 || password.length < 3) {
+    return res.status(400).end()
+  }
 
-  const savedUser = await user.save()
-  res.status(201).json(savedUser)
+  try {
+    const saltRounds = 10
+    const passwordHash = await bcrypt.hash(password, saltRounds)
+
+    const user = new User({
+      username,
+      name,
+      passwordHash
+    })
+    const savedUser = await user.save()
+    res.status(201).json(savedUser)
+
+  } catch (err) {
+    next(err)
+  }
 })
 
 
