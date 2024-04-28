@@ -9,8 +9,8 @@ blogsRouter.get('/', async (req, res) => {
 })
 
 blogsRouter.post('/', tokenExtractor, userExtractor, async (req, res, next) => {
-  const body = req.body
   try {
+    const body = req.body
     const user = req.user
     const newBlog = new Blog({
       title: body.title,
@@ -36,7 +36,7 @@ blogsRouter.delete('/:id', tokenExtractor, userExtractor, async (req, res, next)
       return res.status(400).json({ error: 'blog not found' })
     }
     const user = req.user
-    if (!(blogToDelete.user.toString() === user._id.toString())) {
+    if (blogToDelete.user.toString() !== user._id.toString()) {
       return res.status(401).json({ error: 'token invalid' })
     }
     await Blog.findOneAndDelete(blogToDelete)
@@ -48,22 +48,24 @@ blogsRouter.delete('/:id', tokenExtractor, userExtractor, async (req, res, next)
   }
 })
 
-blogsRouter.put('/:id', async (req, res, next) => {
-  const editedBlog = {
-    title: req.body.title,
-    author: req.body.author,
-    url: req.body.url,
-    likes: req.body.likes
-  }
-
+blogsRouter.put('/:id', tokenExtractor, userExtractor, async (req, res, next) => {
   try {
-    const blogExists = await Blog.findById(req.params.id)
-    if (blogExists !== null) {
-      const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, editedBlog, { new: true })
-      res.status(200).json(updatedBlog)
-    } else {
-      res.status(400).end()
+    const editedBlog = {
+      title: req.body.title,
+      author: req.body.author,
+      url: req.body.url,
+      likes: req.body.likes,
+      user: req.user._id
     }
+    const blogToEdit = await Blog.findById(req.params.id)
+    if (blogToEdit === null) {
+      return res.status(400).end()
+    }
+    if (blogToEdit.user.toString() !== req.user._id.toString()) {
+      return res.status(401).json({ error: 'token invalid' })
+    }
+    const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, editedBlog, { new: true })
+    res.status(200).json(updatedBlog)
   } catch (err) {
     next(err)
   }

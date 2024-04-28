@@ -92,12 +92,10 @@ describe('when creating new users', () => {
             const newUser = {
                 password: 'pekka'
             }
-
             await api
                 .post('/api/users')
                 .send(newUser)
                 .expect(400)
-
             const usersAtEnd = await helper.usersInDb()
             assert.strictEqual(usersAtEnd.length, usersAtStart.length)
         })
@@ -107,20 +105,15 @@ describe('when creating new users', () => {
             const newUser = {
                 username: 'pekka'
             }
-
             await api
                 .post('/api/users')
                 .send(newUser)
                 .expect(400)
-
             const usersAtEnd = await helper.usersInDb()
             assert.strictEqual(usersAtEnd.length, usersAtStart.length)
         })
-
     })
-
 })
-
 
 after(async () => {
     await mongoose.connection.close()
