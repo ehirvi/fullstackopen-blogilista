@@ -154,7 +154,14 @@ describe('when some blogs are initially added', () => {
     })
   })
 
-  describe('deleting a blog', () => {
+  describe('deleting a blog', async () => {
+    beforeEach(async () => {
+      await User.deleteMany({})
+      await Blog.deleteMany({})
+      const user = await helper.createTestUser()
+      await helper.createTestBlog(user)
+    })
+
     test('succeeds with status code 204 if the id is valid', async () => {
       const users = await helper.usersInDb()
       const user = users[0]
@@ -220,6 +227,13 @@ describe('when some blogs are initially added', () => {
   })
 
   describe('editing a blog', () => {
+    beforeEach(async () => {
+      await User.deleteMany({})
+      await Blog.deleteMany({})
+      const user = await helper.createTestUser()
+      await helper.createTestBlog(user)
+    })
+
     test('succeeds if id and object are valid', async () => {
       const users = await helper.usersInDb()
       const user = users[0]
