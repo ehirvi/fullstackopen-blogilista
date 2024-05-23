@@ -154,7 +154,7 @@ describe('when some blogs are initially added', () => {
     })
   })
 
-  describe('deleting a blog', async () => {
+  describe('deleting a blog', () => {
     beforeEach(async () => {
       await User.deleteMany({})
       await Blog.deleteMany({})
