@@ -55,15 +55,15 @@ blogsRouter.put('/:id', tokenExtractor, userExtractor, async (req, res, next) =>
       author: req.body.author,
       url: req.body.url,
       likes: req.body.likes,
-      user: req.user._id
+      user: req.body.user
     }
     const blogToEdit = await Blog.findById(req.params.id)
     if (blogToEdit === null) {
       return res.status(400).end()
     }
-    if (blogToEdit.user.toString() !== req.user._id.toString()) {
-      return res.status(401).json({ error: 'token invalid' })
-    }
+    // if (blogToEdit.user.toString() !== req.user._id.toString()) {
+    //   return res.status(401).json({ error: 'token invalid' })
+    // }
     const updatedBlog = await Blog.findByIdAndUpdate(req.params.id, editedBlog, { new: true })
     res.status(200).json(updatedBlog)
   } catch (err) {
